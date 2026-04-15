@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Digital Finance</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6; /* Soft modern background */
+        }
+
+        /* Modern Navbar Styling */
+        .navbar {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: color 0.2s ease-in-out;
+        }
+
+            .nav-link:hover {
+                color: #0d6efd !important;
+            }
+
+        /* Slick Dropdown Menus */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            padding: 10px 0;
+        }
+
+        .dropdown-item {
+            padding: 8px 24px;
+            font-weight: 500;
+            color: #495057;
+            transition: all 0.2s;
+        }
+
+            .dropdown-item:hover {
+                background-color: #f8f9fa;
+                color: #0d6efd;
+                padding-left: 28px; /* Slight indent on hover for a cool effect */
+            }
+
+        .dropdown-divider {
+            border-top-color: rgba(0,0,0,0.05);
+        }
+
+        /* Footer fix */
+        .footer {
+            background-color: white;
+            border-top: 1px solid rgba(0,0,0,0.05) !important;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light bg-white sticky-top shadow-sm py-3 mb-4">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand text-primary d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-wallet2 me-2 fs-3"></i>Digital Finance
+                </a>
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 ms-3">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item dropdown ms-2">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="adminMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-shield-lock me-1"></i> Admin Panel
+                                </a>
+                                <ul class="dropdown-menu mt-2" aria-labelledby="adminMenu">
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard"><i class="bi bi-speedometer2 me-2 text-muted"></i> Dashboard</a></li>
+                                    <li><a class="dropdown-item" asp-controller="UserManagement" asp-action="Index"><i class="bi bi-people me-2 text-muted"></i> User Management</a></li>
+                                    <li>
+                                        <a class="dropdown-item d-flex justify-content-between align-items-center" asp-controller="LoanManagement" asp-action="Index">
+                                            <span><i class="bi bi-file-earmark-text me-2 text-muted"></i> Manage Loans</span>
+                                            @await Component.InvokeAsync("PendingLoans")
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-controller="Designations" asp-action="Index"><i class="bi bi-briefcase me-2 text-muted"></i> Designations</a></li>
+                                    <li><a class="dropdown-item" asp-controller="LoanTypes" asp-action="Index"><i class="bi bi-cash-stack me-2 text-muted"></i> Loan Types</a></li>
+                                    <li><a class="dropdown-item" asp-controller="AccountCategories" asp-action="Index"><i class="bi bi-tags me-2 text-muted"></i> Account Categories</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-controller="Branches" asp-action="Index"><i class="bi bi-building me-2 text-muted"></i> Branches</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index"><i class="bi bi-person-badge me-2 text-muted"></i> Employees</a></li>
+                                </ul>
+                            </li>
+                        }
+
+                        @* NEW: Employee Section for Loan Processing *@
+                        @if (User.IsInRole("Employee"))
+                        {
+                            <li class="nav-item dropdown ms-2">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="employeeMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-briefcase me-1"></i> Employee Panel
+                                </a>
+                                <ul class="dropdown-menu mt-2" aria-labelledby="employeeMenu">
+                                    <li>
+                                        <a class="dropdown-item d-flex justify-content-between align-items-center" asp-controller="LoanManagement" asp-action="Index">
+                                            <span><i class="bi bi-clipboard-check me-2 text-muted"></i> Loan Applications</span>
+                                            @await Component.InvokeAsync("PendingLoans")
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("Client"))
+                        {
+                            <li class="nav-item ms-2">
+                                <a class="nav-link fw-bold text-primary" asp-controller="Client" asp-action="Dashboard">
+                                    <i class="bi bi-grid me-1"></i> My Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item ms-2">
+                                <a class="nav-link text-dark" asp-controller="Loan" asp-action="RequestLoan">
+                                    <i class="bi bi-journal-text me-1"></i> Request Loan
+                                </a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center ms-lg-3 mt-2 mt-lg-0">
+                                @await Component.InvokeAsync("ClientBalance")
+                            </li>
+                        }
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <partial name="_LoginPartial" />
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container flex-grow-1">
+        <main role="main" class="pb-5">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer text-muted py-4 mt-auto">
+        <div class="container text-center text-sm-start d-sm-flex justify-content-between align-items-center">
+            <div>
+                &copy; 2026 - Digital Finance - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-primary">Privacy Policy</a>
+            </div>
+            <div class="mt-2 mt-sm-0">
+                <small>Secure. Fast. Reliable.</small>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

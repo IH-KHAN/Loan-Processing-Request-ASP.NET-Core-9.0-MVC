@@ -1,0 +1,53 @@
+﻿@model Loan_Processing_Inzamam.ViewModels.BankAccountCreateViewModel
+
+@{
+    ViewData["Title"] = "Open a New Account";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">Open a SecureBank Account</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">Select your preferred account type and make an initial deposit to generate your new account number instantly.</p>
+
+                    <form asp-controller="BankAccount" asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="CategoryId" class="control-label fw-bold"></label>
+                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories">
+                                <option value="">-- Select Account Type --</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="InitialDeposit" class="control-label fw-bold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light fw-bold">৳</span>
+                                <input asp-for="InitialDeposit" class="form-control form-control-lg" type="number" step="0.01" placeholder="e.g., 1000" />
+                            </div>
+                            <small class="text-muted">Minimum deposit is ৳500.</small>
+                            <span asp-validation-for="InitialDeposit" class="text-danger d-block mt-1"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold">Open Account Now</button>
+                            <a asp-controller="Client" asp-action="Dashboard" class="btn btn-light border">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

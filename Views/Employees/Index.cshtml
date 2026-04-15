@@ -1,0 +1,339 @@
+﻿@model IEnumerable<Loan_Processing_Inzamam.Models.Employee>
+
+@{
+    ViewData["Title"] = "Staff Directory";
+}
+
+<div class="container py-4 mb-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="bi bi-people me-2 text-primary"></i>Staff Directory
+            </h2>
+            <p class="text-muted mb-0 small mt-1">Manage employee profiles, designations, and branch assignments.</p>
+        </div>
+        <button class="btn btn-primary fw-bold shadow-sm" id="btnOnboardNew" data-url="@Url.Action("Create", "Employees")">
+            <i class="bi bi-person-plus me-1"></i> Onboard Employee
+        </button>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden" id="employeeGridContainer">
+        @if (!Model.Any())
+        {
+            <div class="card-body text-center py-5">
+                <i class="bi bi-person-badge display-1 text-secondary opacity-25 mb-3 d-block"></i>
+                <h4 class="fw-bold text-dark">No employees found</h4>
+                <p class="text-muted mb-4">You haven't added any staff members to the system yet.</p>
+                <button class="btn btn-outline-primary px-4 fw-bold shadow-sm" id="btnOnboardEmpty" data-url="@Url.Action("Create", "Employees")">
+                    Get Started
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive bg-white">
+                <table class="table table-hover align-middle mb-0" style="border-collapse: collapse;">
+                    <thead class="table-light text-muted small text-uppercase" style="letter-spacing: 0.5px;">
+                        <tr>
+                            <th class="ps-4 fw-semibold py-3 border-bottom-0">Profile</th>
+                            <th class="fw-semibold py-3 border-bottom-0">Employee Details</th>
+                            <th class="fw-semibold py-3 border-bottom-0">Designation</th>
+                            <th class="fw-semibold py-3 border-bottom-0">Branch & Dept</th>
+                            <th class="fw-semibold py-3 border-bottom-0">Status</th>
+                            <th class="text-end pe-4 fw-semibold py-3 border-bottom-0">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="border-bottom border-light">
+                                <td class="ps-4 py-3">
+                                    @if (!string.IsNullOrEmpty(item.PhotoPath))
+                                    {
+                                        <img src="~/images/employees/@item.PhotoPath" alt="@item.Name" class="rounded-circle shadow-sm" style="width: 48px; height: 48px; object-fit: cover; border: 2px solid #fff;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center fw-bold shadow-sm" style="width: 48px; height: 48px; border: 2px solid #fff;">
+                                            @item.Name.Substring(0, 1).ToUpper()
+                                        </div>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark mb-1">@item.Name</div>
+                                    <div class="text-muted small"><i class="bi bi-telephone me-1"></i>@item.Phone</div>
+                                </td>
+                                <td><span class="fw-semibold text-dark">@(item.Designation?.Title ?? "Unassigned")</span></td>
+                                <td>
+                                    <div class="text-dark fw-medium mb-1"><i class="bi bi-building me-1 text-muted"></i>@(item.Branch?.BranchName ?? "Head Office")</div>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 fw-normal">@item.ServiceCategory</span>
+                                </td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2">Inactive</span>
+                                    }
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-sm btn-light text-secondary shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@item.EmployeeId">
+                                            <i class="bi bi-chevron-down"></i>
+                                        </button>
+
+                                        <button class="btn btn-sm btn-light text-primary shadow-sm btn-edit" data-url="@Url.Action("Edit", "Employees", new { id = item.EmployeeId })" title="Edit Employee">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        <form asp-action="Delete" asp-route-id="@item.EmployeeId" method="post" class="d-inline" onsubmit="return confirm('WARNING: Are you sure you want to permanently delete this employee?');">
+                                            <button type="submit" class="btn btn-sm btn-light text-danger shadow-sm" title="Delete Employee">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="collapse bg-light" id="collapse-@item.EmployeeId">
+                                <td colspan="6" class="p-0 border-bottom border-light">
+                                    <div class="p-4 mx-3 my-2 bg-white rounded-3 shadow-sm border border-light">
+                                        <h6 class="fw-bold text-primary mb-3"><i class="bi bi-mortarboard me-2"></i>Educational Background</h6>
+                                        @if (item.EducationalQualifications != null && item.EducationalQualifications.Any())
+                                        {
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-bordered mb-0">
+                                                    <thead class="table-light text-muted small">
+                                                        <tr><th>Degree</th><th>Institution</th><th>Passing Year</th><th>Result</th></tr>
+                                                    </thead>
+                                                    <tbody class="small">
+                                                        @foreach (var qual in item.EducationalQualifications)
+                                                        {
+                                                            <tr>
+                                                                <td class="fw-semibold">@qual.DegreeName</td>
+                                                                <td>@qual.InstitutionName</td>
+                                                                <td>@qual.PassingYear</td>
+                                                                <td>@qual.GradingScore / @qual.OutOf</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <p class="text-muted small mb-0 font-italic">No educational qualifications recorded.</p>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-primary text-white border-0 py-3">
+                <h5 class="modal-title fw-bold" id="employeeModalLabel">Employee Form</h5>
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0" id="employeeModalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+    <div id="successToast" class="toast align-items-center text-bg-success border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body fw-medium fs-6">
+                <i class="bi bi-check-circle-fill me-2"></i><span id="toastMessage">Saved successfully!</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // ---------------------------------------------------------
+            // 1. MODAL LOADING LOGIC (Updated to Event Delegation)
+            // ---------------------------------------------------------
+            // By using $(document).on('click', ...), this ensures the buttons
+            // still work after the table is refreshed via AJAX.
+            $(document).on('click', '#btnOnboardNew, #btnOnboardEmpty, .btn-edit', function () {
+                var url = $(this).data('url');
+                var title = $(this).hasClass('btn-edit') ? "Edit Employee Profile" : "Onboard New Employee";
+
+                $('#employeeModalLabel').text(title);
+                $('#employeeModalBody').html('<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>');
+                $('#employeeModal').modal('show');
+
+                $.get(url, function (data) {
+                    $('#employeeModalBody').html(data);
+                }).fail(function () {
+                    $('#employeeModalBody').html('<div class="alert alert-danger m-4">Failed to load the form. Please try again.</div>');
+                });
+            });
+
+            // Table row collapse icons (Updated to Event Delegation)
+            $(document).on('show.bs.collapse', '.collapse', function () {
+                $(`[data-bs-target="#${this.id}"] i`).removeClass('bi-chevron-down').addClass('bi-chevron-up');
+            }).on('hide.bs.collapse', '.collapse', function () {
+                $(`[data-bs-target="#${this.id}"] i`).removeClass('bi-chevron-up').addClass('bi-chevron-down');
+            });
+
+            // ---------------------------------------------------------
+            // 2. MODAL FORM UI LOGIC
+            // ---------------------------------------------------------
+            $(document).on('change', '#PhotoInput', function (event) {
+                const file = event.target.files[0];
+                const $imagePreview = $("#imagePreview");
+                const $previewContainer = $("#previewContainer");
+
+                if (file) {
+                    const objectUrl = URL.createObjectURL(file);
+                    $imagePreview.attr('src', objectUrl);
+                    $previewContainer.fadeIn();
+
+                    $imagePreview.on('load', function() {
+                        URL.revokeObjectURL(objectUrl);
+                    });
+                } else {
+                    $imagePreview.attr('src', '');
+                    $previewContainer.hide();
+                }
+            });
+
+            $(document).on('change', '#chkSameAddress', function () {
+                if (this.checked) {
+                    $("#divPermAddress").hide();
+                    $("#PermanentAddress").val($("#PresentAddress").val());
+                } else {
+                    $("#divPermAddress").show();
+                    $("#PermanentAddress").val("");
+                }
+            });
+
+            $(document).on('input', '#PresentAddress', function () {
+                if ($("#chkSameAddress").is(':checked')) {
+                    $("#PermanentAddress").val($(this).val());
+                }
+            });
+
+            $(document).on('click', '#btnAddDegree', function () {
+                const $eduBody = $("#eduBody");
+                let rowIdx = $eduBody.find("tr").length;
+
+                const tr = `
+                    <tr class="border-bottom border-light">
+                        <td class="ps-2"><input name="Qualifications[${rowIdx}].DegreeName" class="form-control form-control-sm bg-light border-0" required /></td>
+                        <td><input name="Qualifications[${rowIdx}].InstitutionName" class="form-control form-control-sm bg-light border-0" required /></td>
+                        <td><input name="Qualifications[${rowIdx}].PassingYear" type="number" class="form-control form-control-sm bg-light border-0" required /></td>
+                        <td><input name="Qualifications[${rowIdx}].GradingScore" type="number" step="0.01" class="form-control form-control-sm bg-light border-0" required /></td>
+                        <td>
+                            <select name="Qualifications[${rowIdx}].OutOf" class="form-select form-select-sm bg-light border-0">
+                                <option value="4.0">4.0</option>
+                                <option value="5.0">5.0</option>
+                            </select>
+                        </td>
+                        <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger border-0 remove-row"><i class="bi bi-trash" style="pointer-events: none;"></i></button></td>
+                    </tr>
+                `;
+                $eduBody.append(tr);
+            });
+
+            $(document).on('click', '.remove-row', function () {
+                $(this).closest('tr').remove();
+                $("#eduBody tr").each(function (idx) {
+                    $(this).find("input[name$='.DegreeName']").attr("name", `Qualifications[${idx}].DegreeName`);
+                    $(this).find("input[name$='.InstitutionName']").attr("name", `Qualifications[${idx}].InstitutionName`);
+                    $(this).find("input[name$='.PassingYear']").attr("name", `Qualifications[${idx}].PassingYear`);
+                    $(this).find("input[name$='.GradingScore']").attr("name", `Qualifications[${idx}].GradingScore`);
+                    $(this).find("select[name$='.OutOf']").attr("name", `Qualifications[${idx}].OutOf`);
+                });
+            });
+
+            // ---------------------------------------------------------
+            // 3. MASTER AJAX SUBMISSION (Updated for silent refresh)
+            // ---------------------------------------------------------
+            $(document).on('click', '#btnSubmitAjax', function () {
+                const $form = $(this).closest('form');
+                const formElement = $form[0];
+
+                if (!formElement.checkValidity()) {
+                    formElement.reportValidity();
+                    return false;
+                }
+
+                const $btn = $(this);
+                const $spinner = $("#btnSpinner");
+                const $btnText = $("#btnText");
+                const $errorContainer = $("#errorContainer");
+                const $errorList = $("#errorList");
+
+                const originalText = $btnText.text();
+                const targetUrl = $form.attr('action');
+                const formData = new FormData(formElement);
+
+                $btn.prop("disabled", true);
+                $spinner.removeClass("d-none");
+                $btnText.text("Processing...");
+                $errorContainer.addClass("d-none");
+                $errorList.empty();
+
+                $.ajax({
+                    url: targetUrl,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                // 1. Hide the modal instantly
+                $('#employeeModal').modal('hide');
+
+                // 2. Silently reload the table container
+                $('#employeeGridContainer').load(location.href + ' #employeeGridContainer > *', function() {
+
+                    // 3. Show the success Toast notification
+                    $('#toastMessage').text(response.message || 'Employee saved successfully!');
+                    const toastElement = document.getElementById('successToast');
+                    const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+                    toast.show();
+
+                });
+            } else {
+                response.errors.forEach(err => {
+                    $errorList.append(`<li>${err}</li>`);
+                });
+                $errorContainer.removeClass("d-none");
+                resetBtn();
+            }
+        },
+                    error: function () {
+                        $errorList.append("<li>A critical server error occurred. Please try again.</li>");
+                        $errorContainer.removeClass("d-none");
+                        resetBtn();
+                    }
+                });
+
+                function resetBtn() {
+                    $btn.prop("disabled", false);
+                    $spinner.addClass("d-none");
+                    $btnText.text(originalText);
+                }
+            });
+        });
+    </script>
+}

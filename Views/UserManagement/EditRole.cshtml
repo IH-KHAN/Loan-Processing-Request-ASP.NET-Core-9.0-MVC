@@ -1,0 +1,42 @@
+﻿@model Loan_Processing_Inzamam.ViewModels.UserRoleViewModel
+
+@{
+    ViewData["Title"] = "Assign Role";
+}
+
+<div class="container mt-4">
+    <h2>Assign Role to User</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">@Model.Email</h5>
+                    <p class="card-text mb-4">
+                        <strong>Current Role:</strong>
+                        @(Model.CurrentRoles.Any() ? string.Join(", ", Model.CurrentRoles) : "None")
+                    </p>
+
+                    <form asp-action="EditRole" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="UserId" />
+
+                        <div class="form-group mb-3">
+                            <label asp-for="SelectedRole" class="control-label fw-bold"></label>
+                            <select asp-for="SelectedRole" class="form-select" asp-items="ViewBag.Roles">
+                                <option value="">-- Select a Role --</option>
+                            </select>
+                            <span asp-validation-for="SelectedRole" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary">Update Role</button>
+                            <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

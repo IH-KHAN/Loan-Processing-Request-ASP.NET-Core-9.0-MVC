@@ -1,0 +1,105 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Admin Dashboard</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Clients</h5>
+                    <p class="card-text display-6">@ViewBag.TotalClients</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Employees</h5>
+                    <p class="card-text display-6">@ViewBag.TotalEmployees</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Active Branches</h5>
+                    <p class="card-text display-6">@ViewBag.TotalBranches</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Loans</h5>
+                    <p class="card-text display-6">@ViewBag.PendingLoans</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3 text-secondary">Disbursement Analytics</h4>
+    <div class="row mb-5">
+        <div class="col-md-3">
+            <div class="card text-white bg-success shadow-sm mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">Total Dispersed</h6>
+                    <p class="card-text fs-4 fw-bold">৳@String.Format("{0:N2}", ViewBag.TotalLoanDispersed)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-dark bg-light shadow-sm border-success mb-3">
+                <div class="card-body">
+                    <h6 class="card-title text-success">Average Loan</h6>
+                    <p class="card-text fs-4 fw-bold">৳@String.Format("{0:N2}", ViewBag.AverageLoanDispersed)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-dark bg-light shadow-sm border-primary mb-3">
+                <div class="card-body">
+                    <h6 class="card-title text-primary">Maximum Dispersed</h6>
+                    <p class="card-text fs-4 fw-bold">৳@String.Format("{0:N2}", ViewBag.MaxLoanDispersed)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-dark bg-light shadow-sm border-secondary mb-3">
+                <div class="card-body">
+                    <h6 class="card-title text-secondary">Minimum Dispersed</h6>
+                    <p class="card-text fs-4 fw-bold">৳@String.Format("{0:N2}", ViewBag.MinLoanDispersed)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-dark text-white">System Settings</div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a asp-controller="Designations" asp-action="Index" class="list-group-item list-group-item-action">Manage Designations</a>
+                        <a asp-controller="LoanTypes" asp-action="Index" class="list-group-item list-group-item-action">Manage Loan Types</a>
+                        <a asp-controller="AccountCategories" asp-action="Index" class="list-group-item list-group-item-action">Manage Account Categories</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-dark text-white">Operations Management</div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a asp-controller="Branches" asp-action="Index" class="list-group-item list-group-item-action">Manage Branches</a>
+                        <a asp-controller="Employees" asp-action="Index" class="list-group-item list-group-item-action">Manage Employees</a>
+                        <a asp-controller="LoanManagement" asp-action="Index" class="list-group-item list-group-item-action">Loan Approvals</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

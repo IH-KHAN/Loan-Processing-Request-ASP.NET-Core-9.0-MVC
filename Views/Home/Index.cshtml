@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Welcome to Digital Finance";
+}
+
+<div class="bg-primary text-white rounded-3 shadow-sm mb-5 position-relative overflow-hidden">
+    <div class="container py-5 text-center position-relative" style="z-index: 1;">
+        <h1 class="display-4 fw-bold mb-3">
+            <i class="bi bi-bank me-2"></i>Digital Finance
+        </h1>
+        <p class="lead mb-4 mx-auto" style="max-width: 600px;">
+            Your trusted partner for modern banking. Manage your accounts, apply for fast loans, and secure your financial future all in one place.
+        </p>
+
+        <div class="mt-4">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a asp-controller="Client" asp-action="Dashboard" class="btn btn-light btn-lg fw-bold text-primary px-5 shadow">Go to My Dashboard</a>
+            }
+            else
+            {
+                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-light btn-lg fw-bold text-primary me-3 px-4 shadow">Login</a>
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-light btn-lg fw-bold px-4 text-white border-2">Register</a>
+            }
+        </div>
+    </div>
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-white" style="opacity: 0.05; clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%); z-index: 0;"></div>
+</div>
+
+<div class="container px-0">
+    <div class="row g-4 text-center">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4 hover-lift">
+                <div class="card-body">
+                    <div class="display-5 text-primary mb-3">
+                        <i class="bi bi-cash-coin"></i>
+                    </div>
+                    <h4 class="fw-bold">Fast Loan Approvals</h4>
+                    <p class="text-muted mb-0">Apply online and get your personal or business loans approved with minimal paperwork.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4 hover-lift">
+                <div class="card-body">
+                    <div class="display-5 text-success mb-3">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h4 class="fw-bold">Secure Accounts</h4>
+                    <p class="text-muted mb-0">Open an account instantly to manage your deposits and withdrawals with bank-grade security.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4 hover-lift">
+                <div class="card-body">
+                    <div class="display-5 text-info mb-3">
+                        <i class="bi bi-laptop"></i>
+                    </div>
+                    <h4 class="fw-bold">24/7 Digital Portal</h4>
+                    <p class="text-muted mb-0">Track application statuses, check balances, and update your profile from anywhere, anytime.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

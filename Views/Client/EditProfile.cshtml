@@ -1,0 +1,123 @@
+﻿@model Loan_Processing_Inzamam.ViewModels.ClientEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0">Update Profile Details</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="EditProfile" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="ClientId" />
+                        <input type="hidden" asp-for="ApplicationUserId" />
+                        <input type="hidden" asp-for="ExistingPhotoPath" />
+
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Name" class="control-label fw-bold"></label>
+                                <input asp-for="Name" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="DateOfBirth" class="control-label fw-bold"></label>
+                                <input asp-for="DateOfBirth" class="form-control" type="date" />
+                                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="NIDNumber" class="control-label fw-bold"></label>
+                            <input asp-for="NIDNumber" class="form-control" />
+                            <span asp-validation-for="NIDNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PresentAddress" class="control-label fw-bold"></label>
+                            <textarea asp-for="PresentAddress" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="PresentAddress" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="PermanentAddress" class="control-label fw-bold"></label>
+                            <textarea asp-for="PermanentAddress" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="PermanentAddress" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4 text-center">
+                            <label asp-for="PhotoUpload" class="control-label fw-bold d-block text-start"></label>
+
+                            <div class="mb-3" id="previewContainer" style="@(string.IsNullOrEmpty(Model.ExistingPhotoPath) ? "display: none;" : "display: block;")">
+                                <img id="imagePreview" src="@(string.IsNullOrEmpty(Model.ExistingPhotoPath) ? "" : Url.Content("~/images/clients/" + Model.ExistingPhotoPath))" alt="Profile Preview" class="img-thumbnail rounded shadow-sm" style="width: 150px; height: 150px; object-fit: cover;" />
+                                <div id="previewLabel" class="text-muted small mt-1">
+                                    @(string.IsNullOrEmpty(Model.ExistingPhotoPath) ? "New Photo Preview" : "Current Photo")
+                                </div>
+                            </div>
+
+                            <input asp-for="PhotoUpload" type="file" class="form-control" accept="image/*" id="PhotoInput" />
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Dashboard" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const photoInput = document.getElementById("PhotoInput");
+            const previewContainer = document.getElementById("previewContainer");
+            const imagePreview = document.getElementById("imagePreview");
+            const previewLabel = document.getElementById("previewLabel");
+
+            // Store the original image path just in case the user cancels their selection
+            const originalImagePath = "@(string.IsNullOrEmpty(Model.ExistingPhotoPath) ? "" : Url.Content("~/images/clients/" + Model.ExistingPhotoPath))";
+
+            if (photoInput) {
+                photoInput.addEventListener("change", function () {
+                    const file = this.files[0];
+
+                    if (file) {
+                        // Create a temporary local URL for the selected image
+                        const reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            imagePreview.src = e.target.result;
+                            previewContainer.style.display = "block";
+                            previewLabel.innerText = "New Photo Preview";
+                            previewLabel.classList.add("text-success", "fw-bold");
+                        };
+
+                        reader.readAsDataURL(file);
+                    } else {
+                        // If they open the file dialog but click "Cancel", revert to the original state
+                        if (originalImagePath) {
+                            imagePreview.src = originalImagePath;
+                            previewLabel.innerText = "Current Photo";
+                            previewLabel.classList.remove("text-success", "fw-bold");
+                        } else {
+                            imagePreview.src = "";
+                            previewContainer.style.display = "none";
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

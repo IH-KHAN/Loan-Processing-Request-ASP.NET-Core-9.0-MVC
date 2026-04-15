@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Loan_Processing_Inzamam.ViewModels.UserRoleViewModel>
+
+@{
+    ViewData["Title"] = "Manage Users";
+}
+
+<div class="container mt-4">
+    <h2>SecureBank User Management</h2>
+    <hr />
+
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Email / Username</th>
+                <th>Current Role(s)</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@user.Email</td>
+                    <td>
+                        @if (user.CurrentRoles.Any())
+                        {
+                            @string.Join(", ", user.CurrentRoles)
+                        }
+                        else
+                        {
+                            <span class="text-muted">No Role Assigned</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <a asp-action="EditRole" asp-route-id="@user.UserId" class="btn btn-sm btn-outline-primary">Manage Role</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

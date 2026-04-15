@@ -1,0 +1,154 @@
+﻿@model Loan_Processing_Inzamam.ViewModels.LoanRequestViewModel
+
+@{
+    ViewData["Title"] = "Apply for a Loan";
+}
+
+<div class="container mt-4 mb-5">
+    <h2 class="text-primary">Apply for a New Loan</h2>
+    <p class="text-muted">Fill out the details below to submit your loan application. Our officers will review it shortly.</p>
+    <hr />
+
+    <form asp-controller="Loan" asp-action="RequestLoan" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="All" class="text-danger fw-bold mb-3"></div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="mb-3">Loan Details</h4>
+                <div class="card shadow-sm p-3 mb-4">
+
+                    <div class="form-group mb-3">
+                        <label asp-for="LoanTypeId" class="control-label fw-bold"></label>
+                        <select asp-for="LoanTypeId" class="form-select" asp-items="ViewBag.LoanTypes">
+                            <option value="">-- Select Loan Type --</option>
+                        </select>
+                        <span asp-validation-for="LoanTypeId" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-3">
+                            <label asp-for="DesiredLoanAmount" class="control-label fw-bold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">৳</span>
+                                <input asp-for="DesiredLoanAmount" class="form-control" type="number" step="0.01" />
+                            </div>
+                            <span asp-validation-for="DesiredLoanAmount" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label asp-for="LoanTermMonths" class="control-label fw-bold"></label>
+                            <div class="input-group">
+                                <input asp-for="LoanTermMonths" class="form-control" type="number" />
+                                <span class="input-group-text">Months</span>
+                            </div>
+                            <span asp-validation-for="LoanTermMonths" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="LoanPurpose" class="control-label fw-bold"></label>
+                        <textarea asp-for="LoanPurpose" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="LoanPurpose" class="text-danger"></span>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h4 class="mb-3">Financial Information</h4>
+                <div class="card shadow-sm p-3 mb-4">
+
+                    <div class="form-group mb-3">
+                        <label asp-for="AnnualIncome" class="control-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">৳</span>
+                            <input asp-for="AnnualIncome" class="form-control" type="number" step="0.01" />
+                        </div>
+                        <span asp-validation-for="AnnualIncome" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="TINFileUpload" class="control-label fw-bold"></label>
+                        <input asp-for="TINFileUpload" type="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" />
+                        <small class="form-text text-muted">Please upload a valid copy of your TIN Certificate (PDF or Image).</small>
+                        <span asp-validation-for="TINFileUpload" class="text-danger"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h4 class="mb-0">Guarantor Information</h4>
+                    <button type="button" id="btnAddGuarantor" class="btn btn-sm btn-outline-success">+ Add Guarantor</button>
+                </div>
+
+                <table class="table table-bordered bg-white shadow-sm" id="guarantorTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Relationship</th>
+                            <th>Contact Address</th>
+                            <th>Phone Number</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guarantorBody">
+                        <tr>
+                            <td><input name="Guarantors[0].Name" class="form-control form-control-sm" required /></td>
+                            <td><input name="Guarantors[0].Relationship" class="form-control form-control-sm" required /></td>
+                            <td><input name="Guarantors[0].ContactAddress" class="form-control form-control-sm" required /></td>
+                            <td><input name="Guarantors[0].Phone" type="tel" class="form-control form-control-sm" required /></td>
+                            <td class="text-center"><button type="button" class="btn btn-sm btn-danger remove-row" disabled>X</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-4 text-end">
+            <a asp-controller="Client" asp-action="Dashboard" class="btn btn-secondary me-2">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-lg px-5">Submit Application</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const btnAddGuarantor = document.getElementById("btnAddGuarantor");
+            const guarantorBody = document.getElementById("guarantorBody");
+            let rowIdx = 1;
+
+            btnAddGuarantor.addEventListener("click", function () {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><input name="Guarantors[${rowIdx}].Name" class="form-control form-control-sm" required /></td>
+                    <td><input name="Guarantors[${rowIdx}].Relationship" class="form-control form-control-sm" required /></td>
+                    <td><input name="Guarantors[${rowIdx}].ContactAddress" class="form-control form-control-sm" required /></td>
+                    <td><input name="Guarantors[${rowIdx}].Phone" type="tel" class="form-control form-control-sm" required /></td>
+                    <td class="text-center"><button type="button" class="btn btn-sm btn-danger remove-row">X</button></td>
+                `;
+                guarantorBody.appendChild(tr);
+                rowIdx++;
+            });
+
+            guarantorBody.addEventListener("click", function (e) {
+                if (e.target.classList.contains("remove-row")) {
+                    e.target.closest("tr").remove();
+
+                    // Re-index array so model binding remains valid
+                    const rows = guarantorBody.querySelectorAll("tr");
+                    rows.forEach((row, idx) => {
+                        row.querySelector("input[name$='.Name']").name = `Guarantors[${idx}].Name`;
+                        row.querySelector("input[name$='.Relationship']").name = `Guarantors[${idx}].Relationship`;
+                        row.querySelector("input[name$='.ContactAddress']").name = `Guarantors[${idx}].ContactAddress`;
+                        row.querySelector("input[name$='.Phone']").name = `Guarantors[${idx}].Phone`;
+                    });
+                    rowIdx = rows.length;
+                }
+            });
+        });
+    </script>
+}

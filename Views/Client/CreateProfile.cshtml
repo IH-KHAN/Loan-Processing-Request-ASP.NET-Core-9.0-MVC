@@ -1,0 +1,223 @@
+﻿@model Loan_Processing_Inzamam.ViewModels.ClientProfileViewModel
+
+@{
+    ViewData["Title"] = "Complete Your Profile";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white py-3">
+            <h3 class="mb-0 fw-bold"><i class="bi bi-person-lines-fill me-2"></i>Complete Your Profile</h3>
+            <p class="mb-0 text-white-50 small">Please provide your details to unlock full access to Digital Finance.</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+            <form asp-action="CreateProfile" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-4 fw-bold"></div>
+
+                <div class="row g-5">
+                    <div class="col-md-6">
+                        <h5 class="text-primary border-bottom pb-2 mb-4">
+                            <i class="bi bi-person-badge me-2"></i>Personal Details
+                        </h5>
+
+                        <div class="form-group mb-4 text-center bg-light p-3 rounded-3 border border-light shadow-sm">
+                            <label asp-for="PhotoUpload" class="control-label fw-bold d-block text-start mb-2">Profile Photo</label>
+
+                            <div class="mb-3 position-relative d-inline-block">
+                                <img id="imagePreview" src="" class="rounded-circle img-thumbnail shadow-sm bg-white" style="width: 140px; height: 140px; object-fit: cover; display: none;" alt="Preview" />
+                                <div id="previewPlaceholder" class="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center text-muted shadow-sm mx-auto" style="width: 140px; height: 140px; border: 2px dashed #dee2e6;">
+                                    <div class="text-center">
+                                        <i class="bi bi-camera fs-2 d-block mb-1"></i>
+                                        <small>No photo</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input asp-for="PhotoUpload" type="file" class="form-control form-control-sm" accept="image/*" id="PhotoInput" />
+                            <span asp-validation-for="PhotoUpload" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Name" class="control-label fw-bold"></label>
+                            <input asp-for="Name" class="form-control" placeholder="Full Legal Name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="Phone" class="control-label fw-bold"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-telephone"></i></span>
+                                    <input asp-for="Phone" class="form-control" type="tel" placeholder="01XXXXXXXXX" />
+                                </div>
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 form-group mb-3">
+                                <label asp-for="DateOfBirth" class="control-label fw-bold">Date of Birth</label>
+                                <input asp-for="DateOfBirth" class="form-control" type="date" />
+                                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="NIDNumber" class="control-label fw-bold">NID Number</label>
+                            <input asp-for="NIDNumber" class="form-control" placeholder="10 to 17 digit NID" />
+                            <span asp-validation-for="NIDNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="MaritalStatus" class="control-label fw-bold">Marital Status</label>
+                            <select asp-for="MaritalStatus" class="form-select">
+                                <option value="">-- Select --</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Divorced">Divorced</option>
+                                <option value="Widowed">Widowed</option>
+                            </select>
+                            <span asp-validation-for="MaritalStatus" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h5 class="text-primary border-bottom pb-2 mb-4">
+                            <i class="bi bi-geo-alt me-2"></i>Address Information
+                        </h5>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PresentAddress" class="control-label fw-bold">Present Address</label>
+                            <textarea asp-for="PresentAddress" class="form-control" id="PresentAddress" rows="2" placeholder="Street, City, Postal Code..."></textarea>
+                            <span asp-validation-for="PresentAddress" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input asp-for="IsSameAddress" class="form-check-input" type="checkbox" id="chkSameAddress" />
+                            <label class="form-check-label fw-semibold text-muted" asp-for="IsSameAddress">
+                                Permanent Address is the same as Present Address
+                            </label>
+                        </div>
+
+                        <div class="form-group mb-4" id="divPermanentAddress">
+                            <label asp-for="PermanentAddress" class="control-label fw-bold">Permanent Address</label>
+                            <textarea asp-for="PermanentAddress" class="form-control" rows="2" placeholder="Street, City, Postal Code..."></textarea>
+                            <span asp-validation-for="PermanentAddress" class="text-danger"></span>
+                        </div>
+
+                        <h5 class="text-primary border-bottom pb-2 mb-3 mt-5">
+                            <i class="bi bi-briefcase me-2"></i>Employment Status
+                        </h5>
+
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="IsEmployed" class="form-check-input" type="checkbox" id="chkEmployed" />
+                            <label class="form-check-label fw-semibold text-muted" asp-for="IsEmployed">I am currently employed</label>
+                        </div>
+
+                        <div id="divEmploymentDetails" class="bg-light p-4 rounded-3 border" style="display:none; transition: all 0.3s ease;">
+                            <div class="form-group mb-3">
+                                <label asp-for="EmployerName" class="control-label fw-bold">Employer Name</label>
+                                <input asp-for="EmployerName" class="form-control" placeholder="Company Name" />
+                                <span asp-validation-for="EmployerName" class="text-danger"></span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8 form-group mb-2">
+                                    <label asp-for="Occupation" class="control-label fw-bold"></label>
+                                    <input asp-for="Occupation" class="form-control" placeholder="Job Title" />
+                                    <span asp-validation-for="Occupation" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-4 form-group mb-2">
+                                    <label asp-for="YearsOfExperience" class="control-label fw-bold">Experience (Yrs)</label>
+                                    <input asp-for="YearsOfExperience" type="number" class="form-control" />
+                                    <span asp-validation-for="YearsOfExperience" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-5" />
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold shadow-sm">
+                        <i class="bi bi-check2-circle me-2"></i>Create Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // --- Image Preview Logic ---
+            const photoInput = document.getElementById("PhotoInput");
+            const imagePreview = document.getElementById("imagePreview");
+            const previewPlaceholder = document.getElementById("previewPlaceholder");
+
+            if (photoInput) {
+                photoInput.addEventListener("change", function () {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            // Set the image source
+                            imagePreview.src = e.target.result;
+                            imagePreview.style.display = "inline-block";
+
+                            // Remove the !important flex class and hide the placeholder
+                            previewPlaceholder.classList.remove("d-flex");
+                            previewPlaceholder.classList.add("d-none");
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        // Revert everything if they cancel
+                        imagePreview.src = "";
+                        imagePreview.style.display = "none";
+
+                        // Bring the placeholder back
+                        previewPlaceholder.classList.remove("d-none");
+                        previewPlaceholder.classList.add("d-flex");
+                    }
+                });
+            }
+
+            // --- Toggle Logistics ---
+            const chkEmployed = document.getElementById("chkEmployed");
+            const divEmploymentDetails = document.getElementById("divEmploymentDetails");
+            const chkSameAddress = document.getElementById("chkSameAddress");
+            const divPermanentAddress = document.getElementById("divPermanentAddress");
+
+            // Address Inputs
+            const presentAddress = document.getElementById("PresentAddress");
+            const permanentAddress = divPermanentAddress.querySelector("textarea");
+
+            // Toggle Employment Details
+            chkEmployed.addEventListener("change", function () {
+                divEmploymentDetails.style.display = this.checked ? "block" : "none";
+            });
+
+            // Toggle Permanent Address + Sync Logic
+            chkSameAddress.addEventListener("change", function () {
+                if (this.checked) {
+                    divPermanentAddress.style.display = "none";
+                    permanentAddress.value = presentAddress.value; // Sync values
+                } else {
+                    divPermanentAddress.style.display = "block";
+                    permanentAddress.value = ""; // Clear if unchecked
+                }
+            });
+
+            // Keep them synced if user types while checkbox is checked
+            presentAddress.addEventListener("input", function() {
+                if (chkSameAddress.checked) {
+                    permanentAddress.value = this.value;
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,109 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<div class="container py-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="row g-0">
+
+                    <div class="col-md-7 p-4 p-md-5 bg-white">
+                        <div class="mb-4">
+                            <h2 class="fw-bold text-dark">Welcome back</h2>
+                            <p class="text-muted">Log in to your Digital Finance account securely.</p>
+                        </div>
+
+                        <form id="account" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 fw-bold" role="alert"></div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Email" class="form-control bg-light border-0" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                                <label asp-for="Input.Email" class="text-muted"><i class="bi bi-envelope me-2"></i>Email address</label>
+                                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Password" class="form-control bg-light border-0" autocomplete="current-password" aria-required="true" placeholder="password" />
+                                <label asp-for="Input.Password" class="text-muted"><i class="bi bi-lock me-2"></i>Password</label>
+                                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                                    <label class="form-check-label text-muted small" asp-for="Input.RememberMe">
+                                        @Html.DisplayNameFor(m => m.Input.RememberMe)
+                                    </label>
+                                </div>
+                                <a id="forgot-password" asp-page="./ForgotPassword" class="text-decoration-none small fw-semibold">Forgot password?</a>
+                            </div>
+
+                            <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary fw-bold shadow-sm mb-4">
+                                Log in
+                            </button>
+
+                            <div class="text-center mt-2 d-flex flex-column gap-2">
+                                <div>
+                                    <span class="text-muted small">New to Digital Finance?</span>
+                                    <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none fw-bold small ms-1">Create an account</a>
+                                </div>
+                                <div>
+                                    <a id="resend-confirmation" asp-page="./ResendEmailConfirmation" class="text-decoration-none text-muted small border-bottom border-secondary">Resend email confirmation</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-md-5 bg-primary text-white p-4 p-md-5 d-flex flex-column justify-content-between">
+                        <div>
+                            <h3 class="fw-bold mb-3"><i class="bi bi-wallet2 me-2"></i>Digital Finance</h3>
+                            <p class="text-white-50 mb-4">
+                                Access your dashboard to manage accounts, track loans, and move your money with confidence.
+                            </p>
+
+                            <ul class="list-unstyled mb-0 mt-4">
+                                <li class="mb-3 d-flex align-items-center"><i class="bi bi-shield-check fs-4 text-success me-3 bg-white rounded-circle"></i> Bank-grade encryption</li>
+                                <li class="mb-3 d-flex align-items-center"><i class="bi bi-lightning-charge fs-4 text-warning me-3 bg-white rounded-circle"></i> Real-time updates</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-5 pt-4 border-top border-light border-opacity-25">
+                            <p class="small text-white-50 mb-3">Or log in using a trusted provider:</p>
+
+                            @{
+                                if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                                {
+                                    <div class="alert alert-primary bg-opacity-25 border-0 text-white small p-3">
+                                        <i class="bi bi-info-circle me-1"></i> External logins are currently disabled.
+                                    </div>
+                                }
+                                else
+                                {
+                                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                                        <div class="d-grid gap-2">
+                                            @foreach (var provider in Model.ExternalLogins!)
+                                            {
+                                                <button type="submit" class="btn btn-outline-light" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                                                    <i class="bi bi-google me-2"></i> Continue with @provider.DisplayName
+                                                </button>
+                                            }
+                                        </div>
+                                    </form>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
