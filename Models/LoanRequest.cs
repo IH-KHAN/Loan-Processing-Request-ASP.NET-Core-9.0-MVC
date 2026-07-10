@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -52,6 +52,7 @@ namespace Loan_Processing_Inzamam.Models
 
 
         public virtual ICollection<Guarantor> Guarantors { get; set; }
+        public virtual ICollection<LoanInstallment> LoanInstallments { get; set; } = new List<LoanInstallment>();
     }
     public class Guarantor
     {

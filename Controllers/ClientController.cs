@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
@@ -145,6 +145,8 @@ namespace Loan_Processing_Inzamam.Controllers
                 .Include(c => c.BankAccounts)
                 .Include(c => c.LoanRequests)
                     .ThenInclude(l => l.LoanType) // Includes the specific type of loan requested
+                .Include(c => c.LoanRequests)
+                    .ThenInclude(l => l.LoanInstallments)
                 .FirstOrDefaultAsync(c => c.ApplicationUserId == user.Id);
 
             // Safety net: If they somehow bypassed the Action Filter and don't have a profile

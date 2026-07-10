@@ -1,10 +1,25 @@
-﻿@model Loan_Processing_Inzamam.Models.Client
+@model Loan_Processing_Inzamam.Models.Client
 
 @{
     ViewData["Title"] = "My Dashboard";
 }
 
 <div class="container mt-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <div class="row mb-4">
         <div class="col-12">
             <div class="card bg-primary text-white shadow-sm">
@@ -77,22 +92,25 @@
                     }
                     else
                     {
-                        <table class="table table-hover mb-0">
+                        <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
                                     <th>Loan Type</th>
                                     <th>Amount</th>
                                     <th>Duration</th>
+                                    <th>Paid So Far</th>
                                     <th>Status</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var loan in Model.LoanRequests.OrderByDescending(l => l.RequestDate))
                                 {
                                     <tr>
-                                        <td class="fw-semibold">@loan.LoanType?.TypeName</td>
-                                        <td>৳ @loan.DesiredLoanAmount.ToString("N2")</td>
+                                        <td class="fw-semibold text-dark">@loan.LoanType?.TypeName</td>
+                                        <td class="fw-semibold">৳ @loan.DesiredLoanAmount.ToString("N2")</td>
                                         <td>@loan.LoanTermMonths Months</td>
+                                        <td class="text-success fw-semibold">৳ @(loan.LoanInstallments?.Sum(li => li.AmountPaid).ToString("N2") ?? "0.00")</td>
                                         <td>
                                             @if (loan.Status == "Pending")
                                             {
@@ -100,18 +118,35 @@
                                             }
                                             else if (loan.Status == "Approved")
                                             {
-
                                                 <span class="badge bg-success">Approved</span>
                                             }
                                             else if (loan.Status == "Rejected")
                                             {
-
                                                 <span class="badge bg-danger">Rejected</span>
                                             }
                                             else
                                             {
-
                                                 <span class="badge bg-secondary">@loan.Status</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (loan.Status == "Approved")
+                                            {
+                                                var totalPaidAmount = loan.LoanInstallments?.Sum(li => li.AmountPaid) ?? 0m;
+                                                if (totalPaidAmount < loan.DesiredLoanAmount)
+                                                {
+                                                    <a asp-controller="Loan" asp-action="PayInstallment" asp-route-loanRequestId="@loan.LoanRequestId" class="btn btn-sm btn-outline-success">
+                                                        <i class="bi bi-wallet2 me-1"></i>Pay Installment
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle-fill me-1"></i> Repaid</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted small">-</span>
                                             }
                                         </td>
                                     </tr>

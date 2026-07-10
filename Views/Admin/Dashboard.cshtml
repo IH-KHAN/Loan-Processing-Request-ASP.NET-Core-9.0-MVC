@@ -1,105 +1,462 @@
-﻿@{
+@using Loan_Processing_Inzamam.ViewModels
+@{
     ViewData["Title"] = "Admin Dashboard";
+    var clientSummaries = ViewBag.ClientSummaries as List<ClientSummaryViewModel> ?? new List<ClientSummaryViewModel>();
 }
 
 <div class="container mt-4">
-    <h2 class="mb-4">Admin Dashboard</h2>
-
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Total Clients</h5>
-                    <p class="card-text display-6">@ViewBag.TotalClients</p>
-                </div>
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-0">Admin Control Center</h2>
+            <p class="text-muted mb-0">Oversee deposits, loans, employees, and branch actions.</p>
         </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Total Employees</h5>
-                    <p class="card-text display-6">@ViewBag.TotalEmployees</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Active Branches</h5>
-                    <p class="card-text display-6">@ViewBag.TotalBranches</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Pending Loans</h5>
-                    <p class="card-text display-6">@ViewBag.PendingLoans</p>
-                </div>
-            </div>
-        </div>
+        <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill shadow-sm">Admin Portal</span>
     </div>
 
-    <h4 class="mb-3 text-secondary">Disbursement Analytics</h4>
-    <div class="row mb-5">
-        <div class="col-md-3">
-            <div class="card text-white bg-success shadow-sm mb-3">
-                <div class="card-body">
-                    <h6 class="card-title">Total Dispersed</h6>
-                    <p class="card-text fs-4 fw-bold">৳@String.Format("{0:N2}", ViewBag.TotalLoanDispersed)</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-dark bg-light shadow-sm border-success mb-3">
-                <div class="card-body">
-                    <h6 class="card-title text-success">Average Loan</h6>
-                    <p class="card-text fs-4 fw-bold">৳@String.Format("{0:N2}", ViewBag.AverageLoanDispersed)</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-dark bg-light shadow-sm border-primary mb-3">
-                <div class="card-body">
-                    <h6 class="card-title text-primary">Maximum Dispersed</h6>
-                    <p class="card-text fs-4 fw-bold">৳@String.Format("{0:N2}", ViewBag.MaxLoanDispersed)</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-dark bg-light shadow-sm border-secondary mb-3">
-                <div class="card-body">
-                    <h6 class="card-title text-secondary">Minimum Dispersed</h6>
-                    <p class="card-text fs-4 fw-bold">৳@String.Format("{0:N2}", ViewBag.MinLoanDispersed)</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Modern Tab Navigation -->
+    <ul class="nav nav-pills nav-fill bg-white p-1 rounded-3 shadow-sm border mb-4" id="dashboardTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active py-2.5 fw-semibold rounded-3 d-flex align-items-center justify-content-center" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-content" type="button" role="tab" aria-controls="overview-content" aria-selected="true">
+                <i class="bi bi-speedometer2 me-2"></i>Dashboard Overview
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link py-2.5 fw-semibold rounded-3 d-flex align-items-center justify-content-center" id="clients-tab" data-bs-toggle="tab" data-bs-target="#clients-content" type="button" role="tab" aria-controls="clients-content" aria-selected="false">
+                <i class="bi bi-people-fill me-2"></i>Client Financial Directory
+            </button>
+        </li>
+    </ul>
 
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <div class="card h-100">
-                <div class="card-header bg-dark text-white">System Settings</div>
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        <a asp-controller="Designations" asp-action="Index" class="list-group-item list-group-item-action">Manage Designations</a>
-                        <a asp-controller="LoanTypes" asp-action="Index" class="list-group-item list-group-item-action">Manage Loan Types</a>
-                        <a asp-controller="AccountCategories" asp-action="Index" class="list-group-item list-group-item-action">Manage Account Categories</a>
+    <!-- Tab Contents -->
+    <div class="tab-content" id="dashboardTabsContent">
+        
+        <!-- Tab 1: Dashboard Overview -->
+        <div class="tab-pane fade show active" id="overview-content" role="tabpanel" aria-labelledby="overview-tab">
+            
+            <!-- Count & Financial Metrics Grid -->
+            <div class="row g-3 mb-4">
+                <!-- Total Bank Deposits (Most Prominent) -->
+                <div class="col-lg-4 col-md-12">
+                    <div class="card border-0 text-white shadow-sm h-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);">
+                        <div class="card-body p-4 d-flex flex-column justify-content-between">
+                            <div>
+                                <span class="text-white-50 small fw-bold text-uppercase tracking-wider">Total Bank Deposits</span>
+                                <h3 class="display-6 fw-bold mt-1 mb-0 text-truncate">৳ @String.Format("{0:N2}", ViewBag.TotalDeposits)</h3>
+                            </div>
+                            <div class="d-flex align-items-center mt-3 text-white-50 small">
+                                <i class="bi bi-shield-check me-1 fs-5 text-success"></i> Secured and Managed
+                            </div>
+                        </div>
+                        <i class="bi bi-bank position-absolute text-white-50 opacity-10" style="font-size: 6rem; right: -10px; bottom: -20px;"></i>
+                    </div>
+                </div>
+
+                <!-- Total Clients -->
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="card border-0 bg-white shadow-sm h-100 hover-lift transition">
+                        <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="text-muted small fw-semibold text-uppercase">Total Clients</span>
+                                <div class="rounded-circle bg-primary-subtle text-primary p-2 d-flex justify-content-center align-items-center" style="width:36px; height:36px;">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold mt-3 mb-0 text-dark">@ViewBag.TotalClients</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Employees -->
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="card border-0 bg-white shadow-sm h-100 hover-lift transition">
+                        <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="text-muted small fw-semibold text-uppercase">Employees</span>
+                                <div class="rounded-circle bg-success-subtle text-success p-2 d-flex justify-content-center align-items-center" style="width:36px; height:36px;">
+                                    <i class="bi bi-person-badge"></i>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold mt-3 mb-0 text-dark">@ViewBag.TotalEmployees</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Branches -->
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="card border-0 bg-white shadow-sm h-100 hover-lift transition">
+                        <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="text-muted small fw-semibold text-uppercase">Branches</span>
+                                <div class="rounded-circle bg-info-subtle text-info p-2 d-flex justify-content-center align-items-center" style="width:36px; height:36px;">
+                                    <i class="bi bi-building"></i>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold mt-3 mb-0 text-dark">@ViewBag.TotalBranches</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Loans -->
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="card border-0 bg-white shadow-sm h-100 hover-lift transition">
+                        <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="text-muted small fw-semibold text-uppercase">Pending Loans</span>
+                                <div class="rounded-circle bg-warning-subtle text-warning p-2 d-flex justify-content-center align-items-center" style="width:36px; height:36px;">
+                                    <i class="bi bi-hourglass-split"></i>
+                                </div>
+                            </div>
+                            <h3 class="fw-bold mt-3 mb-0 text-dark">@ViewBag.PendingLoans</h3>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6 mb-3">
-            <div class="card h-100">
-                <div class="card-header bg-dark text-white">Operations Management</div>
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        <a asp-controller="Branches" asp-action="Index" class="list-group-item list-group-item-action">Manage Branches</a>
-                        <a asp-controller="Employees" asp-action="Index" class="list-group-item list-group-item-action">Manage Employees</a>
-                        <a asp-controller="LoanManagement" asp-action="Index" class="list-group-item list-group-item-action">Loan Approvals</a>
+
+            <!-- Disbursement Analytics -->
+            <h4 class="mb-3 text-secondary fw-semibold">Disbursement Analytics</h4>
+            <div class="row g-3 mb-5">
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 bg-success text-white shadow-sm hover-lift transition">
+                        <div class="card-body p-4">
+                            <h6 class="card-title text-white-50 small fw-bold text-uppercase">Total Dispersed</h6>
+                            <h4 class="fw-bold mb-0">৳ @String.Format("{0:N2}", ViewBag.TotalLoanDispersed)</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 bg-white border-start border-4 border-success shadow-sm hover-lift transition">
+                        <div class="card-body p-4">
+                            <h6 class="card-title text-success small fw-bold text-uppercase">Average Loan</h6>
+                            <h4 class="fw-bold mb-0 text-dark">৳ @String.Format("{0:N2}", ViewBag.AverageLoanDispersed)</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 bg-white border-start border-4 border-primary shadow-sm hover-lift transition">
+                        <div class="card-body p-4">
+                            <h6 class="card-title text-primary small fw-bold text-uppercase">Maximum Dispersed</h6>
+                            <h4 class="fw-bold mb-0 text-dark">৳ @String.Format("{0:N2}", ViewBag.MaxLoanDispersed)</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 bg-white border-start border-4 border-secondary shadow-sm hover-lift transition">
+                        <div class="card-body p-4">
+                            <h6 class="card-title text-secondary small fw-bold text-uppercase">Minimum Dispersed</h6>
+                            <h4 class="fw-bold mb-0 text-dark">৳ @String.Format("{0:N2}", ViewBag.MinLoanDispersed)</h4>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Settings & Management Options -->
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100 rounded-3">
+                        <div class="card-header bg-dark text-white py-3">
+                            <h5 class="mb-0 fw-semibold"><i class="bi bi-gear-fill me-2 text-warning"></i>System Settings</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush rounded-bottom-3">
+                                <a asp-controller="Designations" asp-action="Index" class="list-group-item list-group-item-action py-3 px-4 d-flex justify-content-between align-items-center">
+                                    <span>Manage Designations</span>
+                                    <i class="bi bi-chevron-right text-muted"></i>
+                                </a>
+                                <a asp-controller="LoanTypes" asp-action="Index" class="list-group-item list-group-item-action py-3 px-4 d-flex justify-content-between align-items-center">
+                                    <span>Manage Loan Types</span>
+                                    <i class="bi bi-chevron-right text-muted"></i>
+                                </a>
+                                <a asp-controller="AccountCategories" asp-action="Index" class="list-group-item list-group-item-action py-3 px-4 d-flex justify-content-between align-items-center">
+                                    <span>Manage Account Categories</span>
+                                    <i class="bi bi-chevron-right text-muted"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100 rounded-3">
+                        <div class="card-header bg-dark text-white py-3">
+                            <h5 class="mb-0 fw-semibold"><i class="bi bi-sliders me-2 text-info"></i>Operations Management</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush rounded-bottom-3">
+                                <a asp-controller="Branches" asp-action="Index" class="list-group-item list-group-item-action py-3 px-4 d-flex justify-content-between align-items-center">
+                                    <span>Manage Branches</span>
+                                    <i class="bi bi-chevron-right text-muted"></i>
+                                </a>
+                                <a asp-controller="Employees" asp-action="Index" class="list-group-item list-group-item-action py-3 px-4 d-flex justify-content-between align-items-center">
+                                    <span>Manage Employees</span>
+                                    <i class="bi bi-chevron-right text-muted"></i>
+                                </a>
+                                <a asp-controller="LoanManagement" asp-action="Index" class="list-group-item list-group-item-action py-3 px-4 d-flex justify-content-between align-items-center">
+                                    <span>Loan Approvals</span>
+                                    <i class="bi bi-chevron-right text-muted"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
+        <!-- Tab 2: Client Financial Directory -->
+        <div class="tab-pane fade" id="clients-content" role="tabpanel" aria-labelledby="clients-tab">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold text-dark mb-1">Client Financial Directory</h4>
+                    <p class="text-muted mb-4">Search, filter, and sort client balances, active loans, and installment payments.</p>
+
+                    <!-- Search and Filter Controls -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-5">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                                <input type="text" id="clientSearch" class="form-control border-start-0 ps-0" placeholder="Search by name, phone, or NID..." />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="statusFilter" class="form-select">
+                                <option value="all">All Statuses</option>
+                                <option value="active">Active Accounts</option>
+                                <option value="inactive">Inactive Accounts</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select id="financialFilter" class="form-select">
+                                <option value="all">All Financial Activity</option>
+                                <option value="deposits">Has Bank Deposits</option>
+                                <option value="loans">Has Approved Loans</option>
+                                <option value="installments">Has Paid Installments</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Client Summary Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle border mb-0" id="clientTable">
+                            <thead class="table-light text-uppercase small text-muted">
+                                <tr id="clientTableHeader">
+                                    <th scope="col" style="cursor: pointer;" onclick="sortTable(0, 'string')">Client Name <i class="bi bi-arrow-down-up text-muted ms-1"></i></th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">NID</th>
+                                    <th scope="col" style="cursor: pointer; width: 100px;" onclick="sortTable(3, 'string')">Status <i class="bi bi-arrow-down-up text-muted ms-1"></i></th>
+                                    <th scope="col" style="cursor: pointer; text-align: right;" onclick="sortTable(4, 'number')">Deposited Amount <i class="bi bi-arrow-down-up text-muted ms-1"></i></th>
+                                    <th scope="col" style="cursor: pointer; text-align: right;" onclick="sortTable(5, 'number')">Loan Dispersed <i class="bi bi-arrow-down-up text-muted ms-1"></i></th>
+                                    <th scope="col" style="cursor: pointer; text-align: right;" onclick="sortTable(6, 'number')">Installments Paid <i class="bi bi-arrow-down-up text-muted ms-1"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientTableBody">
+                                @if (!clientSummaries.Any())
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center py-5 text-muted">
+                                            <i class="bi bi-inbox fs-1 d-block mb-2 text-black-50"></i>
+                                            No clients found in the system.
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var client in clientSummaries)
+                                    {
+                                        <tr data-name="@client.Name" 
+                                            data-phone="@client.Phone" 
+                                            data-nid="@client.NIDNumber" 
+                                            data-active="@client.IsActive" 
+                                            data-deposited="@client.TotalDeposited" 
+                                            data-loan="@client.TotalLoanTaken" 
+                                            data-installments="@client.TotalInstallmentsMade">
+                                            <td class="fw-semibold text-dark">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="rounded-circle bg-light text-primary d-flex justify-content-center align-items-center me-2.5 fw-bold" style="width:36px; height:36px;">
+                                                        @client.Name.Substring(0, 1).ToUpper()
+                                                    </div>
+                                                    <div>
+                                                        <div>@client.Name</div>
+                                                        <small class="text-muted">ID: @client.ClientId</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-muted">@client.Phone</td>
+                                            <td class="text-muted">@client.NIDNumber</td>
+                                            <td>
+                                                @if (client.IsActive)
+                                                {
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1">Inactive</span>
+                                                }
+                                            </td>
+                                            <td class="text-end fw-semibold text-success">৳ @client.TotalDeposited.ToString("N2")</td>
+                                            <td class="text-end fw-semibold text-primary">৳ @client.TotalLoanTaken.ToString("N2")</td>
+                                            <td class="text-end fw-semibold text-dark">৳ @client.TotalInstallmentsMade.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
+
+<style>
+    /* Premium Styling and Micro-animations */
+    .hover-lift {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+    .transition {
+        transition: all 0.2s ease-in-out;
+    }
+    .me-2.5 {
+        margin-right: 0.75rem !important;
+    }
+    .py-2.5 {
+        padding-top: 0.625rem !important;
+        padding-bottom: 0.625rem !important;
+    }
+    .p-3.5 {
+        padding: 1.15rem !important;
+    }
+    .tracking-wider {
+        letter-spacing: 0.05em;
+    }
+    .nav-pills .nav-link {
+        color: #5c636a;
+        background-color: transparent;
+        transition: all 0.2s ease-in-out;
+    }
+    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+        color: #0d6efd;
+        background-color: #f1f6ff;
+        border: 1px solid rgba(13, 110, 253, 0.15);
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("clientSearch");
+            const statusFilter = document.getElementById("statusFilter");
+            const financialFilter = document.getElementById("financialFilter");
+            const tableBody = document.getElementById("clientTableBody");
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
+            
+            // Search, Filter and Update
+            function filterTable() {
+                const searchQuery = searchInput.value.toLowerCase().trim();
+                const selectedStatus = statusFilter.value;
+                const selectedFinancial = financialFilter.value;
+                
+                rows.forEach(row => {
+                    // Check if it's the empty row
+                    if (row.cells.length === 1 && row.cells[0].getAttribute("colspan") === "7") return;
+
+                    const name = row.getAttribute("data-name").toLowerCase();
+                    const phone = row.getAttribute("data-phone").toLowerCase();
+                    const nid = row.getAttribute("data-nid").toLowerCase();
+                    const isActive = row.getAttribute("data-active") === "True";
+                    const deposited = parseFloat(row.getAttribute("data-deposited"));
+                    const loan = parseFloat(row.getAttribute("data-loan"));
+                    const installments = parseFloat(row.getAttribute("data-installments"));
+                    
+                    // Search match
+                    const matchesSearch = !searchQuery || name.includes(searchQuery) || phone.includes(searchQuery) || nid.includes(searchQuery);
+                    
+                    // Status match
+                    const matchesStatus = selectedStatus === "all" || 
+                                          (selectedStatus === "active" && isActive) || 
+                                          (selectedStatus === "inactive" && !isActive);
+                    
+                    // Financial match
+                    let matchesFinancial = true;
+                    if (selectedFinancial === "deposits") {
+                        matchesFinancial = deposited > 0;
+                    } else if (selectedFinancial === "loans") {
+                        matchesFinancial = loan > 0;
+                    } else if (selectedFinancial === "installments") {
+                        matchesFinancial = installments > 0;
+                    }
+                    
+                    if (matchesSearch && matchesStatus && matchesFinancial) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            }
+            
+            if (searchInput) searchInput.addEventListener("input", filterTable);
+            if (statusFilter) statusFilter.addEventListener("change", filterTable);
+            if (financialFilter) financialFilter.addEventListener("change", filterTable);
+            
+            // Sorting
+            let currentSortColumn = -1;
+            let currentSortOrder = true; // true = asc, false = desc
+            
+            window.sortTable = function (colIndex, type) {
+                const headers = document.querySelectorAll("#clientTableHeader th");
+                
+                // Toggle sort order if same column clicked
+                if (currentSortColumn === colIndex) {
+                    currentSortOrder = !currentSortOrder;
+                } else {
+                    currentSortColumn = colIndex;
+                    currentSortOrder = true;
+                }
+                
+                // Update headers visual state
+                headers.forEach((th, idx) => {
+                    const icon = th.querySelector("i");
+                    if (icon) {
+                        if (idx === colIndex) {
+                            icon.className = currentSortOrder ? "bi bi-arrow-up text-primary ms-1" : "bi bi-arrow-down text-primary ms-1";
+                        } else {
+                            icon.className = "bi bi-arrow-down-up text-muted ms-1";
+                        }
+                    }
+                });
+                
+                const validRows = rows.filter(r => !(r.cells.length === 1 && r.cells[0].getAttribute("colspan") === "7"));
+                
+                const sortedRows = validRows.sort((a, b) => {
+                    let valA = getCellValue(a, colIndex, type);
+                    let valB = getCellValue(b, colIndex, type);
+                    
+                    if (type === 'number') {
+                        return currentSortOrder ? valA - valB : valB - valA;
+                    } else {
+                        return currentSortOrder ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                    }
+                });
+                
+                // Append sorted rows to table body
+                sortedRows.forEach(row => tableBody.appendChild(row));
+            };
+            
+            function getCellValue(row, colIndex, type) {
+                if (type === 'number') {
+                    if (colIndex === 4) return parseFloat(row.getAttribute("data-deposited"));
+                    if (colIndex === 5) return parseFloat(row.getAttribute("data-loan"));
+                    if (colIndex === 6) return parseFloat(row.getAttribute("data-installments"));
+                    return 0;
+                } else {
+                    if (colIndex === 0) return row.getAttribute("data-name");
+                    return row.cells[colIndex].textContent.trim();
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,116 @@
+@model Loan_Processing_Inzamam.ViewModels.PayInstallmentViewModel
+@{
+    ViewData["Title"] = "Pay Installment";
+    var loan = ViewBag.LoanRequest as Loan_Processing_Inzamam.Models.LoanRequest;
+    var totalPaid = (decimal)ViewBag.TotalPaid;
+    var remainingBalance = (decimal)ViewBag.RemainingBalance;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Client" asp-action="Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Pay Installment</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                <div class="card-header bg-primary text-white p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white text-primary rounded-circle p-2.5 d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                            <i class="bi bi-cash-coin fs-4"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Pay Loan Installment</h4>
+                            <small class="text-white-50">Loan Ref: #@loan.LoanRequestId</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 bg-light-subtle">
+                    
+                    <!-- Financial Status Summary -->
+                    <div class="row g-2 mb-4 text-center">
+                        <div class="col-4">
+                            <div class="bg-white p-3 rounded shadow-sm border">
+                                <span class="text-muted small d-block">Loan Amount</span>
+                                <span class="fw-bold text-dark text-truncate d-block">৳@loan.DesiredLoanAmount.ToString("N0")</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="bg-white p-3 rounded shadow-sm border">
+                                <span class="text-muted small d-block">Paid So Far</span>
+                                <span class="fw-bold text-success text-truncate d-block">৳@totalPaid.ToString("N0")</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="bg-white p-3 rounded shadow-sm border">
+                                <span class="text-muted small d-block">Remaining</span>
+                                <span class="fw-bold text-danger text-truncate d-block">৳@remainingBalance.ToString("N0")</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Form -->
+                    <form asp-action="PayInstallment" method="post" class="needs-validation">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="LoanRequestId" />
+
+                        <div class="mb-3">
+                            <label asp-for="BankAccountId" class="form-label fw-semibold text-dark">Deduct From Bank Account</label>
+                            <select asp-for="BankAccountId" asp-items="ViewBag.BankAccounts" class="form-select border-2 py-2.5">
+                                <option value="">-- Choose Account --</option>
+                            </select>
+                            <span asp-validation-for="BankAccountId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Amount" class="form-label fw-semibold text-dark">Payment Amount (৳)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted">৳</span>
+                                <input asp-for="Amount" class="form-control border-start-0 border-2 py-2.5 fw-semibold" placeholder="Enter payment amount" />
+                            </div>
+                            <span asp-validation-for="Amount" class="text-danger small"></span>
+                            <div class="form-text mt-1 text-muted">
+                                Minimum payment ৳1.00. Remaining balance is <strong>৳@remainingBalance.ToString("N2")</strong>.
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg py-2.5 fw-semibold hover-lift">
+                                <i class="bi bi-check2-circle me-1"></i>Confirm Payment
+                            </button>
+                            <a asp-controller="Client" asp-action="Dashboard" class="btn btn-outline-secondary py-2.5">Cancel</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .p-2.5 {
+        padding: 0.65rem !important;
+    }
+    .py-2.5 {
+        padding-top: 0.65rem !important;
+        padding-bottom: 0.65rem !important;
+    }
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

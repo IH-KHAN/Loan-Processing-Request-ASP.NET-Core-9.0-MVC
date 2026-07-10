@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -104,6 +104,122 @@ namespace Loan_Processing_Inzamam.Controllers
 
             // If validation fails, reload the dropdown and return to form
             ViewBag.LoanTypes = new SelectList(_context.LoanTypes.Where(l => l.IsActive), "LoanTypeId", "TypeName", model.LoanTypeId);
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PayInstallment(int loanRequestId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var client = await _context.Clients
+                .Include(c => c.BankAccounts)
+                .FirstOrDefaultAsync(c => c.ApplicationUserId == user.Id);
+
+            if (client == null) return NotFound();
+
+            var loanRequest = await _context.LoanRequests
+                .Include(l => l.LoanType)
+                .Include(l => l.LoanInstallments)
+                .FirstOrDefaultAsync(l => l.LoanRequestId == loanRequestId && l.ClientId == client.ClientId);
+
+            if (loanRequest == null) return NotFound();
+            if (loanRequest.Status != "Approved") return BadRequest("Installments can only be paid on approved loans.");
+
+            if (!client.BankAccounts.Any())
+            {
+                TempData["ErrorMessage"] = "You need a bank account with sufficient funds to pay an installment.";
+                return RedirectToAction("Dashboard", "Client");
+            }
+
+            // Calculate total paid so far
+            decimal totalPaid = loanRequest.LoanInstallments.Sum(i => i.AmountPaid);
+            decimal remainingBalance = loanRequest.DesiredLoanAmount - totalPaid;
+
+            ViewBag.LoanRequest = loanRequest;
+            ViewBag.TotalPaid = totalPaid;
+            ViewBag.RemainingBalance = remainingBalance;
+            ViewBag.BankAccounts = new SelectList(client.BankAccounts.Select(a => new {
+                AccountId = a.AccountId,
+                DisplayText = $"{a.AccountNumber} (Balance: ৳{a.Balance:N2})"
+            }), "AccountId", "DisplayText");
+
+            var model = new PayInstallmentViewModel
+            {
+                LoanRequestId = loanRequestId,
+                Amount = Math.Min(remainingBalance, 1000m)
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PayInstallment(PayInstallmentViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var client = await _context.Clients
+                .Include(c => c.BankAccounts)
+                .FirstOrDefaultAsync(c => c.ApplicationUserId == user.Id);
+
+            if (client == null) return NotFound();
+
+            var loanRequest = await _context.LoanRequests
+                .Include(l => l.LoanInstallments)
+                .FirstOrDefaultAsync(l => l.LoanRequestId == model.LoanRequestId && l.ClientId == client.ClientId);
+
+            if (loanRequest == null) return NotFound();
+            if (loanRequest.Status != "Approved") return BadRequest("Installments can only be paid on approved loans.");
+
+            var account = client.BankAccounts.FirstOrDefault(a => a.AccountId == model.BankAccountId);
+            if (account == null)
+            {
+                ModelState.AddModelError("BankAccountId", "Selected bank account was not found.");
+            }
+            else if (account.Balance < model.Amount)
+            {
+                ModelState.AddModelError("Amount", $"Insufficient funds. Selected account balance is ৳{account.Balance:N2}");
+            }
+
+            decimal totalPaid = loanRequest.LoanInstallments.Sum(i => i.AmountPaid);
+            decimal remainingBalance = loanRequest.DesiredLoanAmount - totalPaid;
+
+            if (model.Amount > remainingBalance)
+            {
+                ModelState.AddModelError("Amount", $"Payment amount (৳{model.Amount:N2}) exceeds the remaining loan balance (৳{remainingBalance:N2}).");
+            }
+
+            if (ModelState.IsValid)
+            {
+                // Deduct from bank account
+                account.Balance -= model.Amount;
+                _context.BankAccounts.Update(account);
+
+                // Create loan installment
+                var installment = new LoanInstallment
+                {
+                    LoanRequestId = loanRequest.LoanRequestId,
+                    AmountPaid = model.Amount,
+                    PaymentDate = DateTime.Now,
+                    PaymentMethod = "Bank Account",
+                    BankAccountId = account.AccountId
+                };
+                _context.LoanInstallments.Add(installment);
+
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Successfully paid installment of ৳{model.Amount:N2} from account #{account.AccountNumber}.";
+                return RedirectToAction("Dashboard", "Client");
+            }
+
+            // Reload ViewBag data if model is invalid
+            ViewBag.LoanRequest = loanRequest;
+            ViewBag.TotalPaid = totalPaid;
+            ViewBag.RemainingBalance = remainingBalance;
+            ViewBag.BankAccounts = new SelectList(client.BankAccounts.Select(a => new {
+                AccountId = a.AccountId,
+                DisplayText = $"{a.AccountNumber} (Balance: ৳{a.Balance:N2})"
+            }), "AccountId", "DisplayText", model.BankAccountId);
+
             return View(model);
         }
     }

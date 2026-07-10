@@ -1,4 +1,4 @@
-﻿using Loan_Processing_Inzamam.Models;
+using Loan_Processing_Inzamam.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +21,7 @@ namespace Loan_Processing_Inzamam.Data
         public DbSet<BankAccount> BankAccounts { get; set; }
         public DbSet<LoanType> LoanTypes { get; set; }
         public DbSet<AccountCategory> AccountCategories { get; set; }
+        public DbSet<LoanInstallment> LoanInstallments { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
 
@@ -41,6 +42,7 @@ namespace Loan_Processing_Inzamam.Data
             builder.Entity<LoanRequest>().Property(l => l.AnnualIncome).HasPrecision(18, 2);
             builder.Entity<BankAccount>().Property(b => b.Balance).HasPrecision(18, 2);
             builder.Entity<LoanType>().Property(l => l.InterestRate).HasPrecision(5, 2);
+            builder.Entity<LoanInstallment>().Property(li => li.AmountPaid).HasPrecision(18, 2);
 
 
             builder.Entity<Client>()
